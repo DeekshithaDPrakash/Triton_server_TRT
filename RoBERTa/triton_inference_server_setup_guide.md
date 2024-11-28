@@ -27,7 +27,8 @@
         --fp16
       ```
 2. Generate config.pbtxt in the below structure:
-   model_repository/
+```
+model_repository/
 ├── ensemble/
 │   ├── config.pbtxt
 │   ├── 1/  # This folder can be empty but must exist
@@ -40,4 +41,7 @@
 ├── postprocessor/
 │   ├── config.pbtxt
 │   ├── 1/
+```
+
+
       

@@ -26,4 +26,18 @@
         --maxShapes=input_ids:8x256,attention_mask:8x256 \
         --fp16
       ```
+2. Generate config.pbtxt in the below structure:
+   model_repository/
+├── ensemble/
+│   ├── config.pbtxt
+│   ├── 1/  # This folder can be empty but must exist
+├── preprocessor/
+│   ├── config.pbtxt
+│   ├── 1/
+├── roberta_classifier/
+│   ├── config.pbtxt
+│   ├── 1/
+├── postprocessor/
+│   ├── config.pbtxt
+│   ├── 1/
       

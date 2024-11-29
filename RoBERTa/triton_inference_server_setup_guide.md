@@ -26,7 +26,18 @@
         --maxShapes=input_ids:8x256,attention_mask:8x256 \
         --fp16
       ```
-2. Generate config.pbtxt in the below structure:
+2. Make triton inference server docker container
+   ```python3
+   sudo docker run -it --net host --shm-size=4g --name trtis_roberta_ens --ulimit memlock=-1 --ulimit stack=67108864 --gpus '"device=0"' -v /local_directory_to_mount:/opt/tritonserver/TensorRT_RoBERTa  nvcr.io/nvidia/tritonserver:24.10-py3
+   ```
+   
+   ###### Since this container doesn't come with transformers package pre-installed, we need to install it
+
+   ```python3
+   pip install transformers==4.43.0 scipy
+   ```
+
+4. Generate config.pbtxt in the below structure:
 ```
 model_repo/
 ├── ensemble/

@@ -81,7 +81,7 @@ postprocessor:-1:logits=logits:predicted_class=predicted_class,probabilities=pro
 3. Launch the triton server
 
    ```python
-   python3 launch_triton_server.py
+   python3 launch_triton_server.py --model_repo=model_repo --http_port 8040 --grpc_port 8041 --metrics_port 8042
    ```
   ##### curl single input:
    ```python

@@ -28,7 +28,7 @@
       ```
 2. Generate config.pbtxt in the below structure:
 ```
-model_repository/
+model_repo/
 ├── ensemble/
 │   ├── config.pbtxt
 │   ├── 1/  # This folder can be empty but must exist
@@ -42,6 +42,84 @@ model_repository/
 │   ├── config.pbtxt
 │   ├── 1/
 ```
+##### Use fill_template.py to generate config.pbtxt for preprocess, classifier and post process
+```python
+python fill_template.py -o model_repo/preprocessor/config.pbtxt \
+-n preprocessor -b 8 --backend python \
+-i "raw_text:TYPE_STRING:-1" \
+-u "input_ids:TYPE_INT32:128;attention_mask:TYPE_INT32:128" \
+-p "tokenizer_dir:tokenizer"
+```
+```python
+python3 fill_template.py -o model_repo/roberta_classifier/config.pbtxt \
+-n roberta_classifier -b 8 --backend tensorrt_plan --platform tensorrt_plan \
+-i "input_ids:TYPE_INT32:128;attention_mask:TYPE_INT32:128" \
+-u "logits:TYPE_FP32:3"
+```
+```python
+python3 fill_template.py -o model_repo/postprocessor/config.pbtxt \
+-n postprocessor -b 8 --backend python \
+-i "logits:TYPE_FP32:-1" \
+-u "probabilities:TYPE_FP32:-1,3;predicted_class:TYPE_INT64:-1"
+```
+##### Use fill_template_ensemble.py to generate config.pbtxt for ensemble
+```python
+python3 fill_template_ensemble.py \
+  -o model_repo/ensemble/config.pbtxt \
+  -n ensemble \
+  -b 8 \
+  -i "raw_text:TYPE_STRING:-1" \
+  -u "predicted_class:TYPE_INT64:3;probabilities:TYPE_FP32:-1,3" \
+  -e "preprocessor:-1:raw_text=raw_text:input_ids=input_ids,attention_mask=attention_mask;\
+roberta_classifier:-1:input_ids=input_ids,attention_mask=attention_mask:logits=logits;\
+postprocessor:-1:logits=logits:predicted_class=predicted_class,probabilities=probabilities"
+```
 
+##### Add model.py file inside preprocess and post process's "1" Folder
+##### Add model.plan inside classifier's "1" Folder
 
-      
+3. Launch the triton server
+
+   ```python
+   python3 launch_triton_server.py
+   ```
+  ##### curl single input:
+   ```python
+   curl -X POST localhost:8000/v2/models/ensemble/infer -d '{
+     "inputs": [
+       {
+         "name": "raw_text",
+         "shape": [1, 1],
+         "datatype": "BYTES",
+         "data": [
+           "what is your good name?"
+         ]
+       }
+     ],
+     "outputs": [
+       { "name": "probabilities" },
+       { "name": "predicted_class" }
+     ]
+   }'
+```
+##### curl multiple inputs
+```python
+curl -X POST localhost:8000/v2/models/ensemble/infer -d '{
+  "inputs": [
+    {
+      "name": "raw_text",
+      "shape": [3, 1],
+      "datatype": "BYTES",
+      "data": [
+        "what is your name",
+        "this is so good",
+        "He was so scared"
+      ]
+    }
+  ],
+  "outputs": [
+    { "name": "probabilities" },
+    { "name": "predicted_class" }
+  ]
+}'
+```

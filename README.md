@@ -1,4 +1,4 @@
-This repo consists of guidelines to use Triton inference server suign TensorRT/TensorRT-LLM
+This repo consists of guidelines to use Triton inference server using TensorRT/TensorRT-LLM
 
 
 Note:

@@ -75,11 +75,13 @@ python3 /opt/tritonserver/scripts/launch_triton_server.py --world_size 1 --model
    There are chances that AI server (nvidia) and shoot up and server goes down.
    In such cases, follow the below steps
    Firstly, restart the docker
-   ``` sudo docker restart docker_name"
+   ```python
+   sudo docker restart docker_name"
    ```
 
    Attach the docker:
-   ``` sudo docker attach docker_name
+   ```python
+   sudo docker attach docker_name
    ```
 
    Now, if you launch the triton server directly there is a possibility of 2 major issues: mpirun and hpc-x

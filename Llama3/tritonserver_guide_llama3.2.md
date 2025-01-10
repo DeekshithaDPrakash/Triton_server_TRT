@@ -71,3 +71,21 @@ python3 ${COMMON_DIR}tools/fill_template.py -i ${COMMON_DIR}inflight_batcher_llm
 python3 /opt/tritonserver/scripts/launch_triton_server.py --world_size 1 --model_repo=/opt/tritonserver/inflight_batcher_llm --http_port 8010 --grpc_port 8011 --metrics_port 8012
 ````
 
+8. Errors and solutions
+   There are chances that AI server (nvidia) and shoot up and server goes down.
+   In such cases, follow the below steps
+   Firstly, restart the docker
+   ``` sudo docker restart docker_name"
+   ```
+
+   Attach the docker:
+   ``` sudo docker attach docker_name
+   ```
+
+   Now, if you launch the triton server directly there is a possibility of 2 major issues: mpirun and hpc-x
+   The hpc-x error results in import error for pre and post-processing models making then not READY
+
+   So, right after the docker is attached add apirun and hpc-x to LD_LIBRARY_PATH
+
+   
+

@@ -76,7 +76,7 @@ python3 /opt/tritonserver/scripts/launch_triton_server.py --world_size 1 --model
    In such cases, follow the below steps
    Firstly, restart the docker
    ```python
-   sudo docker restart docker_name"
+   sudo docker restart docker_name
    ```
 
    Attach the docker:
@@ -88,6 +88,12 @@ python3 /opt/tritonserver/scripts/launch_triton_server.py --world_size 1 --model
    The hpc-x error results in import error for pre and post-processing models making then not READY
 
    So, right after the docker is attached add apirun and hpc-x to LD_LIBRARY_PATH
+   ```python
+   export PATH=/usr/local/mpi/bin:$PATH
+   export LD_LIBRARY_PATH=/usr/local/mpi/lib:$LD_LIBRARY_PATH
+   export LD_LIBRARY_PATH=/opt/hpcx/ucc/lib:/opt/hpcx/ucx/lib:$LD_LIBRARY_PATH
+   ```
+   
 
    
 

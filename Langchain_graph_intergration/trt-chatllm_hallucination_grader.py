@@ -143,3 +143,16 @@ hallucination_prompt = ChatPromptTemplate.from_messages([
 
 # Create the grading chain
 hallucination_grader = hallucination_prompt | structured_llm_grader
+
+
+#example:
+documents = "Fact 1: The earth is round.\nFact 2: The moon orbits the earth."
+generation = "The earth may be round"
+result = hallucination_grader.invoke({"documents": documents, "generation": generation})
+
+
+#expected result:
+
+# Server response: {'batch_index': 0, 'context_logits': 0.0, 'cum_log_probs': 0.0, 'generation_logits': 0.0, 'model_name': 'ensemble', 'model_version': '1', 'output_log_probs': [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 'sequence_end': False, 'sequence_id': 0, 'sequence_start': False, 'text_output': 'yes'}
+
+

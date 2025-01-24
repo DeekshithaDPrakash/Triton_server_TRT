@@ -228,4 +228,113 @@ for question in test_questions:
 
 
 
+class GradeDocuments(BaseModel):
+    """score for relevance check on retrieved documents."""
+    binary_score: str = Field(
+        description="Documents are relevant to the question"
+    )
+
+# Create the structured grader
+structured_llm_grader = llm.with_structured_output(GradeDocuments)
+
+# Define the system prompt
+system = """You are a grader tasked with assessing the relevance of a retrieved document to a user question.
+Evaluate the relevance on a scale of 1 to 5, where:
+
+1 - The document is completely unrelated to the question.
+2 - The document is mostly unrelated, with only minor or tangential relevance.
+3 - The document has some relevance but lacks sufficient depth or completeness.
+4 - The document is largely relevant and addresses most aspects of the question.
+5 - The document is highly relevant and directly addresses the question comprehensively.
+
+Consider both keyword overlap and semantic alignment with the user's question. The evaluation does not need to be overly strict; the primary goal is to filter out documents that are irrelevant while retaining those with meaningful connections. 
+
+The output must only include the numerical score values."""
+
+# Create the grading prompt template
+grade_prompt = ChatPromptTemplate.from_messages([
+    ("system", system),
+    ("human", "Retrieved document: \n\n {document} \n\n User question: {question}"),
+])
+
+# Create the retrieval grader chain
+retrieval_grader = grade_prompt | structured_llm_grader
+
+result = retrieval_grader.invoke({
+    "document": "KARI successfully launched the KPLO lunar orbiter in 2022.",
+    "question": "What are KARI's space exploration achievements?"
+})
+print(result)
+
+# Define RAG system prompt
+rag_system = """You are an assistant for question-answering tasks. 
+Use the following pieces of retrieved context to answer the question. 
+If you don't know the answer, just say that you don't know. 
+Use five related sentences maximum and keep the answer concise."""
+
+rag_prompt = ChatPromptTemplate.from_messages([
+    ("system", rag_system),
+    ("user", "Question: {question}"),
+    ("user", "Context: {context}")
+])
+
+# Create the RAG chain with TRTLLMChat and output parser
+rag_chain = rag_prompt | llm | StrOutputParser()
+
+# Define the question and context
+question = "tech skills."
+context = "Codecademy is an interactive online learning platform offering courses in various programming languages and tech skills. It provides a hands-on, project-based approach to learning, allowing users to write and execute code directly in the browser. The platform covers topics such as web development, data science, computer science, and machine learning. Codecademy features a mix of free and paid content, with the Pro membership granting access to advanced courses, quizzes, and real-world projects. The site also includes community forums, career advice, and a personalized learning path to help users achieve their specific goals."
+
+# Define the grading schema
+class GradeDocuments(BaseModel):
+    """Score for relevance check on retrieved documents."""
+    binary_score: str = Field(
+        description="Documents are relevant to the question, 'yes' or 'no'."
+    )
+
+# Create the structured grader
+structured_llm_grader = llm.with_structured_output(GradeDocuments)
+
+# Define the grading system prompt
+system_grading_prompt = """You are an intelligent yes/no teller, telling yes/no the relevance of a retrieved document to a user question.
+Output EXACTLY 'yes' or 'no'. say 'yes' if retrieved document is relevant to the user question, otherwise say 'no'."""
+
+grade_prompt = ChatPromptTemplate.from_messages([
+    ("system", system_grading_prompt),
+    ("human", "Retrieved document: {document}\nUser question: {question}")
+])
+
+# Create the grading chain
+retrieval_grader = grade_prompt | structured_llm_grader
+
+# First grade the document
+grade_result = retrieval_grader.invoke({
+    "document": context,
+    "question": question
+})
+
+print("Grading result:", grade_result)
+
+def extract_grade(response):
+    """Extract 'yes' or 'no' from the grader response"""
+    content = response.binary_score.lower().strip()
+    print("Extracted grade:", content)
+    return content if content in ["yes", "no"] else "no"
+
+# Extract the grade
+is_relevant = extract_grade(grade_result)
+
+# If the document is relevant, generate an answer
+if is_relevant == "yes":
+    answer = rag_chain.invoke({
+        "context": context,
+        "question": question
+    })
+    print("Generated Answer:", answer)
+else:
+    print("No relevant context found for the question.")
+
+
+
+
 

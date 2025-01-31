@@ -290,6 +290,7 @@ grade_prompt = ChatPromptTemplate.from_messages([
 # Create the retrieval grader chain
 retrieval_grader = grade_prompt | structured_llm_grader
 
+### Note: if any additional text is added after the prompt in human {question}, it returns None
 
         
 

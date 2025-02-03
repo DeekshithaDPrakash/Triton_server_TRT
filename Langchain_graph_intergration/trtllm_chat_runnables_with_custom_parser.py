@@ -10,6 +10,22 @@ import requests
 import json
 import re
 
+class YesNoResponse(BaseModel):
+    """Binary yes/no response"""
+    binary_score: str  =  Field(description="answer must be 'yes' or 'no'")
+
+class IntResponse(BaseModel):
+    """Integer scale response"""
+    int_score: int = Field(description="Rating must be between 1 and 5")
+
+class FloatResponse(BaseModel):
+    """Float scale response."""
+    float_score: float = Field(description="Score must be between 0.0 and 1.0")
+
+class CategoryResponse(BaseModel):
+    "Menu section reponse"
+    category: str =  Field(decription="Selected menu categories")
+
 class TRTLLMChat(BaseChatModel):
     url: str = Field(..., description="URL of the Triton inference server endpoint")
     temperature: float = Field(0.0, description="Sampling temperature") 
@@ -68,14 +84,15 @@ class TRTLLMChat(BaseChatModel):
         schema: Union[Dict, Type[BaseModel]],
         *,
         include_raw: bool = False,
-    ) -> Runnable[LanguageModelInput, Dict]:
-        def parse_yesno(output: AIMessage) -> str:
+    ) -> Runnable[LanguageModelInput, YesNoResponse]:
+        def parse_yesno(output: AIMessage) -> Optional[YesNoResponse]:
             try:
                 text = output.content.strip().lower()
                 match = re.search(r"\b(yes|no)\b", text)
                 # print(match.group(1))
                 if match:
-                    return match.group(1)
+                    # return match.group(1)
+                    return YesNoResponse(binary_score=match.group(1))
                 return None
             except Exception as e:
                 print(f"Error parsing yes/no output: {str(e)}")
@@ -90,15 +107,16 @@ class TRTLLMChat(BaseChatModel):
         schema: Union[Dict, Type[BaseModel]],
         *,
         include_raw: bool = False,
-    ) -> Runnable[LanguageModelInput, Dict]:
-        def parse_scale(output: AIMessage) -> str:
+    ) -> Runnable[LanguageModelInput, IntResponse]:
+        def parse_scale(output: AIMessage) -> Optional[IntResponse]:
             try:
                 text = output.content.strip()
                 match = re.search(r"\b[1-5]\b", text)
                 # print(match)
                 if match:
                     # return {"rating": match.group(0)}
-                    return match.group(0)
+                    # return match.group(0)
+                    return IntResponse(int_score=match.group(0))
                 return None
             except Exception as e:
                 print(f"Error parsing scale output: {str(e)}")
@@ -113,8 +131,8 @@ class TRTLLMChat(BaseChatModel):
         schema: Union[Dict, Type[BaseModel]],
         *,
         include_raw: bool = False,
-    ) -> Runnable[LanguageModelInput, Dict]:
-        def parse_menu(output: AIMessage) -> str:
+    ) -> Runnable[LanguageModelInput, CategoryResponse]:
+        def parse_menu(output: AIMessage) -> Optional[CategoryResponse]:
             try:
                 # print("OUTPUT",output)
                 text = output.content.strip()
@@ -132,8 +150,9 @@ class TRTLLMChat(BaseChatModel):
                 # print("Menu",text)
                 for option in menu_options:
                     if option.lower() in text.lower():
-                        return option
-                return "not retrieving"
+                        # return option
+                        return CategoryResponse(category=option)
+                return CategoryResponse(category="not retrieving")
             except Exception as e:
                 print(f"Error parsing menu output: {str(e)}")
                 return None
@@ -148,15 +167,16 @@ class TRTLLMChat(BaseChatModel):
         schema: Union[Dict, Type[BaseModel]],
         *,
         include_raw: bool = False,
-    ) -> Runnable[LanguageModelInput, Dict]:
-        def parse_float(output: AIMessage) -> Optional[Dict]:
+    ) -> Runnable[LanguageModelInput, FloatResponse]:
+        def parse_float(output: AIMessage) -> Optional[FloatResponse]:
             try:
                 text = output.content.strip()
                 match = re.search(r"(\d+\.\d{1,2})", text)
                 if match:
                     value = float(match.group(1))
                     if 0 <= value <= 1:
-                        return value
+                        # return value
+                        return FloatResponse(float_score=value)
                 return None
             except Exception as e:
                 print(f"Error parsing float output: {str(e)}")
@@ -209,6 +229,7 @@ result = hallucination_grader.invoke({
 })
 
 print(result)
+print(result.binary_score)
 
 
 # Define route query schema

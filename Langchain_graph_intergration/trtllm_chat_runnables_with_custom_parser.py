@@ -213,7 +213,8 @@ Do NOT include any other words or sentences in your answer."""
 # Create the prompt template
 hallucination_prompt = ChatPromptTemplate.from_messages([
     ("system", system_prompt),
-    ("human", "Set of facts: \n\n {documents} \n\n LLM generation: {generation} \n\n Score:"),
+    ("human", "Set of facts: \n\n {documents} \n\n LLM generation: {generation} \n\n"),
+    ("assistant", "")
 ])
 
 # Create the grading chain

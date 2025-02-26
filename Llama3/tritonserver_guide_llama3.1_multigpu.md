@@ -3,7 +3,7 @@ Using 2 GPU's:
 1. Make docker image: choose 24.10 as it comes with transformers 4.45.1
 
 ```python
-docker run -it --net host --shm-size=4g --name your_docker_image_name --ulimit memlock=-1 --ulimit stack=67108864 --gpus '"device=0, 1"' -v /your_local_repo_with_llama3.1_model_or_finetuned_llama3.1:/opt/tritonserver/TensorRT_LLM  nvcr.io/nvidia/tritonserver:24.08-trtllm-python-py3
+docker run -it --net host --shm-size=4g --name your_docker_image_name --ulimit memlock=-1 --ulimit stack=67108864 --gpus '"device=0, 1"' -v /your_local_repo_with_llama3.1_model_or_finetuned_llama3.1:/opt/tritonserver/TensorRT_LLM nvcr.io/nvidia/tritonserver:24.10-trtllm-python-py3
 ```
 2. Clone the tesnorrtllm_backend : I chose the same release branch as my docker container version
 

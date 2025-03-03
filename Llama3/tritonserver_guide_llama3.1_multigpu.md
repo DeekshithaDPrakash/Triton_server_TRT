@@ -25,15 +25,14 @@ git submodule update --init --recursive`
 ```python
 CONVERT_CHKPT_SCRIPT=/opt/tritonserver/TensorRT_LLM/tensorrtllm_backend/tensorrt_llm/examples/llama/convert_checkpoint.py
 LLAMA_MODEL=/opt/tritonserver/TensorRT_LLM/llama3.2_model
-UNIFIED_CKPT_PATH=/opt/tritonserver/TensorRT_LLM/ckpt/llaam32/3b
-ENGINE_DIR=/opt/tritonserver/TensorRT_LLM/engines/1-gpu
+UNIFIED_CKPT_PATH=/opt/tritonserver/TensorRT_LLM/ckpt/2-gpus/llama31/8b
+ENGINE_DIR=/opt/tritonserver/TensorRT_LLM/engines/2-gpus  
 
 ```
 4. Execute convert_checkpoint.py with --use_embedding_sharing tag
 
 ```python
-python3 ${CONVERT_CHKPT_SCRIPT} --model_dir ${LLAMA_MODEL} --output_dir ${UNIFIED_CKPT_PATH} --dtype float16 --use_embedding_sharing --tp_size=2
-``` 
+ python3 ${CONVERT_CHKPT_SCRIPT} --model_dir ${LLAMA_MODEL} --output_dir ${UNIFIED_CKPT_PATH} --dtype float16 --tp_s``` 
 
 5. Build the engine
 ```python

@@ -32,7 +32,7 @@ ENGINE_DIR=/opt/tritonserver/TensorRT_LLM/engines/2-gpus
 4. Execute convert_checkpoint.py with --use_embedding_sharing tag
 
 ```python
- python3 ${CONVERT_CHKPT_SCRIPT} --model_dir ${LLAMA_MODEL} --output_dir ${UNIFIED_CKPT_PATH} --dtype float16 --tp_s``` 
+ python3 ${CONVERT_CHKPT_SCRIPT} --model_dir ${LLAMA_MODEL} --output_dir ${UNIFIED_CKPT_PATH} --dtype float16 --tp_size=2``` 
 
 5. Build the engine
 ```python
